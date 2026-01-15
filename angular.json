@@ -2,11 +2,12 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
-    "myapp": {
+    "jbtlc": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -22,7 +23,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": [
               "src/styles.css"
@@ -56,10 +58,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "myapp:build:production"
+              "buildTarget": "jbtlc:build:production"
             },
             "development": {
-              "buildTarget": "myapp:build:development"
+              "buildTarget": "jbtlc:build:development"
             }
           },
           "defaultConfiguration": "development"
