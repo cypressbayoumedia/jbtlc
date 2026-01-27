@@ -19,6 +19,9 @@ export class PosComponent {
 
     // State
     amountInput = signal<string>('');
+    customerName = signal<string>('');
+    customerEmail = signal<string>('');
+
     amount = computed(() => {
         const val = parseFloat(this.amountInput());
         return isNaN(val) ? 0 : val;
@@ -33,9 +36,22 @@ export class PosComponent {
         locale: 'en',
         appearance: {
             theme: 'stripe',
-            labels: 'floating',
+            variables: {
+                colorPrimary: '#0071e3', // Apple Blue
+                colorBackground: '#ffffff',
+                colorText: '#1d1d1f',
+                colorDanger: '#df1b41',
+                borderRadius: '12px',
+                spacingUnit: '4px',
+            },
         },
     } as StripeElementsOptions);
+
+    // NOTE: For "NFC" or "Contactless" payments in this web app, 
+    // we rely on the Digital Wallets (Apple Pay / Google Pay) 
+    // which are automatically handled by the Payment Element 
+    // if the user's device supports it. 
+    // Browsers do not grant direct access to NFC hardware for raw card reading.
 
     paymentElementOptions: StripePaymentElementOptions = {
         layout: 'tabs',
@@ -68,14 +84,35 @@ export class PosComponent {
         }
     }
 
+    // Setters for template binding
+    setName(event: Event) {
+        this.customerName.set((event.target as HTMLInputElement).value);
+    }
+
+    setEmail(event: Event) {
+        this.customerEmail.set((event.target as HTMLInputElement).value);
+    }
+
     // Start Payment Flow
     initiatePayment() {
-        if (this.amount() <= 0) return;
+        const amt = this.amount();
+        if (amt < 15) {
+            alert('Minimum transaction amount is $15.00');
+            return;
+        }
+
+        if (!this.customerName() || !this.customerEmail()) {
+            alert('Please enter Customer Name and Email');
+            return;
+        }
 
         this.isProcessing.set(true);
 
         // Create PaymentIntent via Service
-        this.paymentService.createPaymentIntent(this.amount() * 100).subscribe({
+        this.paymentService.createPaymentIntent(amt * 100, {
+            customerName: this.customerName(),
+            customerEmail: this.customerEmail()
+        }).subscribe({
             next: (res) => {
                 this.elementsOptions.set({
                     ...this.elementsOptions(),
@@ -87,7 +124,7 @@ export class PosComponent {
             error: (err: any) => {
                 console.error(err);
                 this.isProcessing.set(false);
-                alert('Failed to initialize payment. Check console.');
+                alert(err.message || 'Failed to initialize payment.');
             }
         });
     }
@@ -115,7 +152,8 @@ export class PosComponent {
                 return_url: window.location.href,
                 payment_method_data: {
                     billing_details: {
-                        name: 'Walk-in Customer'
+                        name: this.customerName(),
+                        email: this.customerEmail()
                     }
                 }
             },

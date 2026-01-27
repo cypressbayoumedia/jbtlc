@@ -1,19 +1,27 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Functions, httpsCallable } from '@angular/fire/functions';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PaymentService {
-  private http = inject(HttpClient);
+  private functions = inject(Functions);
 
-  // This should call your actual backend to create a PaymentIntent.
-  // Since we don't have a backend yet, this simulates a response.
-  createPaymentIntent(amount: number): Observable<{ clientSecret: string }> {
-    console.warn('Simulating PaymentIntent creation. Connect to a backend for real payments.');
-    // Simulated delay
-    return of({ clientSecret: 'pi_mock_secret_12345' }).pipe(delay(1000));
+  createPaymentIntent(amount: number, metadata?: { customerName?: string, customerEmail?: string }): Observable<{ clientSecret: string }> {
+    const createPaymentIntent = httpsCallable<{ amount: number; currency: string; customerName?: string; customerEmail?: string }, { clientSecret: string }>(
+      this.functions,
+      'createPaymentIntent'
+    );
+
+    return from(createPaymentIntent({
+      amount,
+      currency: 'usd',
+      customerName: metadata?.customerName,
+      customerEmail: metadata?.customerEmail
+    })).pipe(
+      map(result => result.data)
+    );
   }
 }

@@ -40,9 +40,18 @@
         </button>
     </div>
 
+    <div class="customer-info" style="display: flex; gap: 16px; margin-bottom: 24px;">
+        <input type="text" placeholder="Customer Name" (input)="setName($event)" [value]="customerName()"
+            class="pos-input">
+        <input type="email" placeholder="Customer Email" (input)="setEmail($event)" [value]="customerEmail()"
+            class="pos-input">
+    </div>
+
     <div class="actions">
         <button class="clear-btn" (click)="onKeypadClick('C')">Clear</button>
-        <button class="primary-btn charge-btn" [disabled]="amount() <= 0 || isProcessing()" (click)="initiatePayment()">
+        <button class="primary-btn charge-btn"
+            [disabled]="amount() < 15 || isProcessing() || !customerName() || !customerEmail()"
+            (click)="initiatePayment()">
             Charge {{ amount() | currency }}
         </button>
     </div>
@@ -53,6 +62,8 @@
         <div class="stripe-header">
             <h3>Total to Pay</h3>
             <div class="stripe-amount">{{ amount() | currency }}</div>
+            <p class="payment-instructions">Use <strong>Tap to Pay</strong> (Google/Apple Pay) or enter card details
+                below.</p>
         </div>
 
         @if (elementsOptions().clientSecret) {
