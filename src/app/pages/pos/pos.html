@@ -1,0 +1,79 @@
+<div class="pos-container">
+
+    @if (paymentStatus() === 'success') {
+    <div class="success-screen">
+        <div class="icon-circle">
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="currentColor">
+                <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
+            </svg>
+        </div>
+        <h2>Payment Successful!</h2>
+        <p class="amount-display">{{ amount() | currency }}</p>
+        <button class="primary-btn" (click)="reset()">New Transaction</button>
+    </div>
+    } @else {
+
+    @if (!isPaymentElementVisible()) {
+    <!-- Keypad Mode -->
+    <div class="amount-header">
+        <span class="currency-symbol">$</span>
+        <span class="amount-value">{{ amountInput() || '0.00' }}</span>
+    </div>
+
+    <div class="keypad">
+        <button (click)="onKeypadClick('1')">1</button>
+        <button (click)="onKeypadClick('2')">2</button>
+        <button (click)="onKeypadClick('3')">3</button>
+        <button (click)="onKeypadClick('4')">4</button>
+        <button (click)="onKeypadClick('5')">5</button>
+        <button (click)="onKeypadClick('6')">6</button>
+        <button (click)="onKeypadClick('7')">7</button>
+        <button (click)="onKeypadClick('8')">8</button>
+        <button (click)="onKeypadClick('9')">9</button>
+        <button (click)="onKeypadClick('.')">.</button>
+        <button (click)="onKeypadClick('0')">0</button>
+        <button (click)="onKeypadClick('backspace')" class="icon-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                <path
+                    d="M360-200q-20 0-37.5-9T294-234L80-560l214-326q11-16 28.5-25t37.5-9h440q33 0 56.5 23.5T880-840v560q0 33-23.5 56.5T800-200H360Zm40-80h400v-560H400L216-560l184 280Zm80-123 120-120 120 120 56-56-120-120 120-120-56-56-120 120-120-120-56 56 120 120-120 120 56 56Zm-80-157v-280 280Z" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="actions">
+        <button class="clear-btn" (click)="onKeypadClick('C')">Clear</button>
+        <button class="primary-btn charge-btn" [disabled]="amount() <= 0 || isProcessing()" (click)="initiatePayment()">
+            Charge {{ amount() | currency }}
+        </button>
+    </div>
+
+    } @else {
+    <!-- Stripe Payment Element Mode -->
+    <div class="stripe-container">
+        <div class="stripe-header">
+            <h3>Total to Pay</h3>
+            <div class="stripe-amount">{{ amount() | currency }}</div>
+        </div>
+
+        @if (elementsOptions().clientSecret) {
+        <ngx-stripe-elements [stripe]="stripe" [elementsOptions]="elementsOptions()">
+            <ngx-stripe-payment [options]="paymentElementOptions" />
+        </ngx-stripe-elements>
+
+        <div class="stripe-actions">
+            <button class="secondary-btn" (click)="reset()">Cancel</button>
+            <button class="primary-btn" (click)="confirmPayment()" [disabled]="isProcessing()">
+                @if (isProcessing()) {
+                Processing...
+                } @else {
+                Pay Now
+                }
+            </button>
+        </div>
+        } @else {
+        <p>Loading payment options...</p>
+        }
+    </div>
+    }
+    }
+</div>
