@@ -18,13 +18,19 @@ export class PosComponent {
     public stripe = injectStripe(); // Made public for template access
 
     // State
-    amountInput = signal<string>('');
+    products = [
+        { id: 'soursop', name: 'Soursop Leaves', description: 'Fresh, organic Soursop leaves.', price: 15, image: 'assets/products/soursop-leaves.png' },
+        { id: 'tropical', name: 'Tropical Blend', description: 'Includes Soursop, Mango, and Pineapple Guava.', price: 25, image: 'assets/products/tropical-blend.png' }
+    ];
+
+    selectedProduct = signal<{ id: string, name: string, description: string, price: number } | null>(null);
+    quantity = signal<number>(1);
     customerName = signal<string>('');
     customerEmail = signal<string>('');
 
     amount = computed(() => {
-        const val = parseFloat(this.amountInput());
-        return isNaN(val) ? 0 : val;
+        const product = this.selectedProduct();
+        return product ? product.price * this.quantity() : 0;
     });
 
     isProcessing = signal(false);
@@ -47,41 +53,25 @@ export class PosComponent {
         },
     } as StripeElementsOptions);
 
-    // NOTE: For "NFC" or "Contactless" payments in this web app, 
-    // we rely on the Digital Wallets (Apple Pay / Google Pay) 
-    // which are automatically handled by the Payment Element 
-    // if the user's device supports it. 
-    // Browsers do not grant direct access to NFC hardware for raw card reading.
-
     paymentElementOptions: StripePaymentElementOptions = {
         layout: 'tabs',
     };
 
-    // ViewChild for Stripe Payment Element Component
-    // Using explicit type or any to avoid property access issues
     paymentElement = viewChild(StripePaymentElementComponent);
 
-    // Keypad Logic
-    onKeypadClick(key: string) {
-        if (this.isPaymentElementVisible()) return;
+    selectProduct(product: any) {
+        if (this.isProcessing()) return;
 
-        const current = this.amountInput();
+        this.selectedProduct.set(product);
+        this.quantity.set(1);
+    }
 
-        if (key === 'C') {
-            this.amountInput.set('');
-        } else if (key === 'backspace') {
-            this.amountInput.set(current.slice(0, -1));
-        } else if (key === '.') {
-            if (!current.includes('.')) {
-                this.amountInput.set(current + '.');
-            }
-        } else {
-            // Limit to 2 decimal places
-            const parts = current.split('.');
-            if (parts.length > 1 && parts[1].length >= 2) return;
+    incrementQuantity() {
+        this.quantity.update(q => q + 1);
+    }
 
-            this.amountInput.set(current + key);
-        }
+    decrementQuantity() {
+        this.quantity.update(q => (q > 1 ? q - 1 : 1));
     }
 
     // Setters for template binding
@@ -93,25 +83,14 @@ export class PosComponent {
         this.customerEmail.set((event.target as HTMLInputElement).value);
     }
 
-    // Start Payment Flow
-    initiatePayment() {
-        const amt = this.amount();
-        if (amt < 15) {
-            alert('Minimum transaction amount is $15.00');
-            return;
-        }
-
-        if (!this.customerName() || !this.customerEmail()) {
-            alert('Please enter Customer Name and Email');
-            return;
-        }
-
+    // Start Transaction (manual trigger)
+    startCheckout() {
         this.isProcessing.set(true);
 
-        // Create PaymentIntent via Service
-        this.paymentService.createPaymentIntent(amt * 100, {
-            customerName: this.customerName(),
-            customerEmail: this.customerEmail()
+        // Create PaymentIntent via Service (initially without customer details)
+        this.paymentService.createPaymentIntent(this.amount() * 100, {
+            customerName: '',
+            customerEmail: ''
         }).subscribe({
             next: (res) => {
                 this.elementsOptions.set({
@@ -133,6 +112,11 @@ export class PosComponent {
     confirmPayment() {
         if (this.isProcessing()) return;
 
+        if (!this.customerName() || !this.customerEmail()) {
+            alert('Please enter your Name and Email to complete the specific purchase.');
+            return;
+        }
+
         this.isProcessing.set(true);
         const component = this.paymentElement();
 
@@ -143,7 +127,6 @@ export class PosComponent {
         }
 
         // Access elements from the component. 
-        // We cast to any because the type definition might vary or be missing properties in this environment.
         const elements = (component as any).elements;
 
         this.stripe.confirmPayment({
@@ -161,11 +144,9 @@ export class PosComponent {
         }).subscribe({
             next: (result: any) => {
                 if (result.error) {
-                    // Show error
                     console.error(result.error);
                     this.paymentStatus.set('error');
                 } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-                    // Success
                     this.paymentStatus.set('success');
                     this.triggerConfetti();
                 }
@@ -180,7 +161,7 @@ export class PosComponent {
     }
 
     reset() {
-        this.amountInput.set('');
+        this.selectedProduct.set(null);
         this.isPaymentElementVisible.set(false);
         this.paymentStatus.set('idle');
     }

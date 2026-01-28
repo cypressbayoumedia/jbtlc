@@ -7,66 +7,79 @@
                 <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
             </svg>
         </div>
-        <h2>Payment Successful!</h2>
+        <h2>Order Confirmed!</h2>
+        <p class="success-note">Please show this screen to the staff.</p>
         <p class="amount-display">{{ amount() | currency }}</p>
-        <button class="primary-btn" (click)="reset()">New Transaction</button>
+        <button class="primary-btn" (click)="reset()">Place Another Order</button>
     </div>
     } @else {
 
     @if (!isPaymentElementVisible()) {
-    <!-- Keypad Mode -->
-    <div class="amount-header">
-        <span class="currency-symbol">$</span>
-        <span class="amount-value">{{ amountInput() || '0.00' }}</span>
+    <!-- Product Selection Mode -->
+    <div class="product-selection">
+        <h2 class="section-title">Select a Product</h2>
+        <div class="product-list">
+            @for (product of products; track product.id) {
+            <div class="product-card" [class.selected]="selectedProduct()?.id === product.id"
+                (click)="selectProduct(product)">
+                <div class="product-image">
+                    <img [src]="product.image" [alt]="product.name">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-desc">{{ product.description }}</p>
+                </div>
+                <div class="product-price">{{ product.price | currency }}</div>
+            </div>
+            }
+        </div>
     </div>
+    }
 
-    <div class="keypad">
-        <button (click)="onKeypadClick('1')">1</button>
-        <button (click)="onKeypadClick('2')">2</button>
-        <button (click)="onKeypadClick('3')">3</button>
-        <button (click)="onKeypadClick('4')">4</button>
-        <button (click)="onKeypadClick('5')">5</button>
-        <button (click)="onKeypadClick('6')">6</button>
-        <button (click)="onKeypadClick('7')">7</button>
-        <button (click)="onKeypadClick('8')">8</button>
-        <button (click)="onKeypadClick('9')">9</button>
-        <button (click)="onKeypadClick('.')">.</button>
-        <button (click)="onKeypadClick('0')">0</button>
-        <button (click)="onKeypadClick('backspace')" class="icon-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-                <path
-                    d="M360-200q-20 0-37.5-9T294-234L80-560l214-326q11-16 28.5-25t37.5-9h440q33 0 56.5 23.5T880-840v560q0 33-23.5 56.5T800-200H360Zm40-80h400v-560H400L216-560l184 280Zm80-123 120-120 120 120 56-56-120-120 120-120-56-56-120 120-120-120-56 56 120 120-120 120 56 56Zm-80-157v-280 280Z" />
-            </svg>
-        </button>
-    </div>
-
-    <div class="customer-info" style="display: flex; gap: 16px; margin-bottom: 24px;">
-        <input type="text" placeholder="Customer Name" (input)="setName($event)" [value]="customerName()"
-            class="pos-input">
-        <input type="email" placeholder="Customer Email" (input)="setEmail($event)" [value]="customerEmail()"
-            class="pos-input">
-    </div>
-
-    <div class="actions">
-        <button class="clear-btn" (click)="onKeypadClick('C')">Clear</button>
-        <button class="primary-btn charge-btn"
-            [disabled]="amount() < 15 || isProcessing() || !customerName() || !customerEmail()"
-            (click)="initiatePayment()">
-            Charge {{ amount() | currency }}
-        </button>
-    </div>
-
-    } @else {
-    <!-- Stripe Payment Element Mode -->
-    <div class="stripe-container">
-        <div class="stripe-header">
-            <h3>Total to Pay</h3>
-            <div class="stripe-amount">{{ amount() | currency }}</div>
-            <p class="payment-instructions">Use <strong>Tap to Pay</strong> (Google/Apple Pay) or enter card details
-                below.</p>
+    <!-- Quantity & Review Mode -->
+    @if (selectedProduct() && !isPaymentElementVisible() && !isProcessing()) {
+    <div class="checkout-review">
+        <div class="quantity-controls">
+            <button class="qty-btn" (click)="decrementQuantity()">−</button>
+            <span class="qty-value">{{ quantity() }}</span>
+            <button class="qty-btn" (click)="incrementQuantity()">+</button>
         </div>
 
-        @if (elementsOptions().clientSecret) {
+        <div class="total-display">
+            <span>Total:</span>
+            <span class="total-amount">{{ amount() | currency }}</span>
+        </div>
+
+        <button class="primary-btn checkout-btn" (click)="startCheckout()">
+            Checkout - {{ amount() | currency }}
+        </button>
+    </div>
+    }
+
+    <!-- Loading State -->
+    @if (isProcessing() && !isPaymentElementVisible()) {
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Preparing Checkout...</p>
+    </div>
+    }
+
+    <!-- Stripe Payment Element Mode (Includes Name/Email inputs now) -->
+    @if (isPaymentElementVisible()) {
+    <div class="stripe-container">
+        <div class="stripe-header">
+            <h3>Complete Your Purchase</h3>
+            <div class="stripe-amount">{{ amount() | currency }}</div>
+            <p class="payment-instructions">Enter your details and payment info below.</p>
+        </div>
+
+        <div class="customer-info embedded">
+            <input type="text" placeholder="Your Name" (input)="setName($event)" [value]="customerName()"
+                class="pos-input">
+            <input type="email" placeholder="Your Email" (input)="setEmail($event)" [value]="customerEmail()"
+                class="pos-input">
+        </div>
+
         <ngx-stripe-elements [stripe]="stripe" [elementsOptions]="elementsOptions()">
             <ngx-stripe-payment [options]="paymentElementOptions" />
         </ngx-stripe-elements>
@@ -77,14 +90,12 @@
                 @if (isProcessing()) {
                 Processing...
                 } @else {
-                Pay Now
+                Pay {{ amount() | currency }}
                 }
             </button>
         </div>
-        } @else {
-        <p>Loading payment options...</p>
-        }
     </div>
     }
     }
+
 </div>

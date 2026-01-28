@@ -53,7 +53,7 @@ export const createPaymentIntent = onCall(async (request) => {
             automatic_payment_methods: {
                 enabled: true,
             },
-            receipt_email: customerEmail, // Stripe will email the receipt automatically if live mode
+            receipt_email: customerEmail || undefined, // Send undefined if empty to avoid "invalid email" error
         });
 
         // 3. Return clientSecret to the client
