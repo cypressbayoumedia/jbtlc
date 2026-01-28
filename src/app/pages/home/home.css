@@ -25,15 +25,13 @@
   width: 100%;
 }
 
-.brand-name {
+.brand-logo {
   display: block;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #a3d95b;
-  /* Lime green accent */
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  max-width: 200px;
+  /* Adjust size as needed */
+  height: auto;
+  margin: 0 auto 1.5rem auto;
+  /* Center and add bottom margin */
 }
 
 .hero-title {
