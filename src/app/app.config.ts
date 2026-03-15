@@ -7,6 +7,8 @@ import { routes } from './app.routes';
 // Firebase Imports
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFunctions, getFunctions } from '@angular/fire/functions';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 // Firebase Config (User needs to replace this)
 const firebaseConfig = {
@@ -26,6 +28,8 @@ export const appConfig: ApplicationConfig = {
 
     // Firebase Providers
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
     provideFunctions(() => getFunctions()),
   ]
 };

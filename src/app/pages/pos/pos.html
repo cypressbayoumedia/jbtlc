@@ -17,6 +17,10 @@
     @if (!isPaymentElementVisible()) {
     <!-- Product Selection Mode -->
     <div class="product-selection">
+        <div class="kiosk-banner">
+            <span class="kiosk-badge">In Person Pickup Only</span>
+            <p>Please order only if you are in person.</p>
+        </div>
         <h2 class="section-title">Select a Product</h2>
         <div class="product-list">
             @for (product of products; track product.id) {
