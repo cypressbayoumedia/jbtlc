@@ -1,0 +1,21 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  min-height: 60vh;
+}
+
+.page-container h1 {
+  font-family: 'The Seasons', serif;
+  font-size: 3rem;
+  color: var(--color-black);
+  margin-bottom: 1.5rem;
+}
+
+.page-container p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--color-black);
+  max-width: 800px;
+}
