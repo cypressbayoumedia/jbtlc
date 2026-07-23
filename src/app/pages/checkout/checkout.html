@@ -1,0 +1,238 @@
+<section class="checkout-container">
+  <!-- Step Progress Bar -->
+  <nav class="step-progress" aria-label="Checkout progress">
+    <ol class="step-list">
+      <li class="step-item" [class.active]="stepIndex() >= 0" [class.completed]="stepIndex() > 0">
+        <span class="step-number">1</span>
+        <span class="step-label">Review</span>
+      </li>
+      <li class="step-connector" [class.completed]="stepIndex() > 0"></li>
+      <li class="step-item" [class.active]="stepIndex() >= 1" [class.completed]="stepIndex() > 1">
+        <span class="step-number">2</span>
+        <span class="step-label">Information</span>
+      </li>
+      <li class="step-connector" [class.completed]="stepIndex() > 1"></li>
+      <li class="step-item" [class.active]="stepIndex() >= 2" [class.completed]="stepIndex() > 2">
+        <span class="step-number">3</span>
+        <span class="step-label">Payment</span>
+      </li>
+      <li class="step-connector" [class.completed]="stepIndex() > 2"></li>
+      <li class="step-item" [class.active]="stepIndex() >= 3">
+        <span class="step-number">4</span>
+        <span class="step-label">Confirmed</span>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Error Banner -->
+  @if (errorMessage()) {
+    <div class="error-banner" role="alert" id="checkout-error">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="checkout-layout">
+    <!-- Main Content -->
+    <div class="checkout-main">
+
+      <!-- STEP 1: Review -->
+      @if (currentStep() === 'review') {
+        <div class="step-panel">
+          <h1>Review Your Order</h1>
+          @if (!cart.hasItems()) {
+            <div class="empty-cart">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <p>Your cart is empty</p>
+              <a routerLink="/shop" class="btn-secondary" id="browse-teas-btn">Browse Teas</a>
+            </div>
+          } @else {
+            <div class="cart-items">
+              @for (item of cart.items(); track item.productId) {
+                <div class="cart-item" [attr.id]="'cart-item-' + item.productId">
+                  <div class="cart-item-image">
+                    @if (item.imageUrl) {
+                      <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
+                    } @else {
+                      <div class="img-placeholder"></div>
+                    }
+                  </div>
+                  <div class="cart-item-info">
+                    <h3 class="cart-item-name">{{ item.name }}</h3>
+                    <p class="cart-item-price">{{ item.price | currency }} each</p>
+                  </div>
+                  <div class="cart-item-qty">
+                    <label class="visually-hidden" [attr.for]="'qty-' + item.productId">Quantity</label>
+                    <input
+                      type="number"
+                      class="qty-input"
+                      [attr.id]="'qty-' + item.productId"
+                      [value]="item.quantity"
+                      min="1"
+                      max="99"
+                      (change)="updateItemQty(item.productId, $event)"
+                    />
+                  </div>
+                  <div class="cart-item-total">
+                    {{ item.price * item.quantity | currency }}
+                  </div>
+                  <button class="remove-btn" (click)="cart.removeItem(item.productId)" [attr.aria-label]="'Remove ' + item.name" [attr.id]="'remove-' + item.productId">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="step-actions">
+              <a routerLink="/shop" class="btn-link" id="continue-shopping-link">← Continue shopping</a>
+              <button class="btn-primary" (click)="proceedToInfo()" id="proceed-to-info-btn">
+                Continue to Information
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- STEP 2: Information -->
+      @if (currentStep() === 'info') {
+        <div class="step-panel">
+          <h1>Your Information</h1>
+          <p class="step-subtitle">We'll send your order confirmation to this email.</p>
+          <div class="form-group">
+            <label for="checkout-name" class="form-label">Full Name</label>
+            <input
+              type="text"
+              id="checkout-name"
+              class="form-input"
+              placeholder="Jane Doe"
+              [value]="customerName()"
+              (input)="setName($event)"
+              autocomplete="name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="checkout-email" class="form-label">Email Address</label>
+            <input
+              type="email"
+              id="checkout-email"
+              class="form-input"
+              placeholder="jane@example.com"
+              [value]="customerEmail()"
+              (input)="setEmail($event)"
+              autocomplete="email"
+            />
+          </div>
+          <div class="step-actions">
+            <button class="btn-link" (click)="goToStep('review')" id="back-to-review-btn">← Back to review</button>
+            <button
+              class="btn-primary"
+              (click)="proceedToPayment()"
+              [disabled]="isProcessing()"
+              id="proceed-to-payment-btn"
+            >
+              @if (isProcessing()) {
+                <span class="btn-spinner"></span>
+                Preparing payment…
+              } @else {
+                Continue to Payment
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- STEP 3: Payment -->
+      @if (currentStep() === 'payment') {
+        <div class="step-panel">
+          <h1>Payment</h1>
+          <p class="step-subtitle">All transactions are secure and encrypted.</p>
+          @if (elementsOptions().clientSecret) {
+            <div class="stripe-wrapper" ngxStripeElements [elementsOptions]="elementsOptions()">
+              <ngx-stripe-payment [options]="paymentElementOptions" />
+            </div>
+          }
+          <div class="step-actions">
+            <button class="btn-link" (click)="goToStep('info')" id="back-to-info-btn">← Back to information</button>
+            <button
+              class="btn-primary btn-pay"
+              (click)="confirmPayment()"
+              [disabled]="isProcessing()"
+              id="confirm-payment-btn"
+            >
+              @if (isProcessing()) {
+                <span class="btn-spinner"></span>
+                Processing…
+              } @else {
+                Pay {{ cart.totalPrice() | currency }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              }
+            </button>
+          </div>
+          <div class="trust-badges">
+            <span class="trust-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Secure 256-bit SSL
+            </span>
+            <span class="trust-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              Satisfaction Guaranteed
+            </span>
+          </div>
+        </div>
+      }
+
+      <!-- STEP 4: Confirmation -->
+      @if (currentStep() === 'confirmation') {
+        <div class="step-panel confirmation-panel">
+          <div class="success-checkmark">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h1>Order Confirmed!</h1>
+          <p class="confirmation-text">Thank you for your purchase! A confirmation email has been sent to <strong>{{ customerEmail() }}</strong>.</p>
+          <p class="confirmation-subtext">Your botanical leaf teas are on their way.</p>
+          <button class="btn-primary" (click)="reset()" id="continue-shopping-btn">
+            Continue Shopping
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Order Summary Sidebar (visible on steps 1-3) -->
+    @if (currentStep() !== 'confirmation' && cart.hasItems()) {
+      <aside class="order-summary" aria-label="Order summary">
+        <h2>Order Summary</h2>
+        <div class="summary-items">
+          @for (item of cart.items(); track item.productId) {
+            <div class="summary-item">
+              <span class="summary-item-name">{{ item.name }} <span class="summary-item-qty">×{{ item.quantity }}</span></span>
+              <span class="summary-item-price">{{ item.price * item.quantity | currency }}</span>
+            </div>
+          }
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-subtotal">
+          <span>Subtotal</span>
+          <span>{{ cart.totalPrice() | currency }}</span>
+        </div>
+        <div class="summary-row summary-shipping">
+          <span>Shipping</span>
+          <span class="free-shipping">Free</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-total">
+          <span>Total</span>
+          <span>{{ cart.totalPrice() | currency }}</span>
+        </div>
+      </aside>
+    }
+  </div>
+</section>

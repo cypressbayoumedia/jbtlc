@@ -17,7 +17,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url('/assets/remodel/hero-bg.jpg');
+  background-image: url('/assets/hero-image.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

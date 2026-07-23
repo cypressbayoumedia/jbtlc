@@ -7,7 +7,6 @@ import confetti from 'canvas-confetti';
 
 @Component({
     selector: 'app-pos',
-    standalone: true,
     imports: [CommonModule, StripeElementsDirective, StripePaymentElementComponent],
     templateUrl: './pos.html',
     styleUrl: './pos.css',

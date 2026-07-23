@@ -1,4 +1,46 @@
 <section class="page-container">
-  <h1>Shop</h1>
-  <p>Our collection of premium wellness teas is coming soon.</p>
+  <header class="shop-header">
+    <h1>Shop Botanical Leaf Teas</h1>
+    <p>Explore our curated collection of premium botanical leaf teas — pure, natural, and handpicked for wellness.</p>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state" aria-live="polite">
+      <div class="loading-spinner"></div>
+      <p>Loading our tea collection…</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (teas().length === 0) {
+    <div class="empty-state">
+      <p>No teas available at the moment. Check back soon!</p>
+    </div>
+  } @else {
+    <div class="product-grid">
+      @for (tea of teas(); track tea.sys.id) {
+        <a class="product-card-link" [routerLink]="['/shop', tea.fields['slug']]" [attr.aria-label]="'View ' + (tea.fields['productName'] || 'product')">
+          <article class="product-card" [attr.id]="'product-' + tea.sys.id">
+            @if (tea.fields['primaryImage']?.fields?.['file']?.['url']) {
+              <div class="product-image-wrapper">
+                <img
+                  [src]="'https:' + tea.fields['primaryImage'].fields['file']['url']"
+                  [alt]="tea.fields['productName'] || 'Botanical tea'"
+                  class="product-image"
+                  loading="lazy"
+                />
+              </div>
+            }
+            <div class="product-details">
+              <h2 class="product-name">{{ tea.fields['productName'] }}</h2>
+              @if (tea.fields['price'] !== undefined) {
+                <p class="product-price">{{ tea.fields['price'] | currency }}</p>
+              }
+            </div>
+          </article>
+        </a>
+      }
+    </div>
+  }
 </section>

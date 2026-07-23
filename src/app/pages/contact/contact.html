@@ -1,4 +1,189 @@
-<section class="page-container">
-  <h1>Contact</h1>
-  <p>Get in touch with J&amp;B's Tropical Leaf Corner.</p>
+<section class="contact-page">
+
+  <!-- Hero Banner -->
+  <div class="contact-hero">
+    <div class="hero-content">
+      <h1>Get In Touch</h1>
+      <p class="hero-subtitle">We'd love to hear from you. Whether you have a question about our teas, wholesale inquiries, or just want to say hello — reach out.</p>
+    </div>
+    <div class="hero-leaf hero-leaf--left" aria-hidden="true">🌿</div>
+    <div class="hero-leaf hero-leaf--right" aria-hidden="true">🍃</div>
+  </div>
+
+  <div class="contact-body">
+
+    <!-- Contact Info Cards -->
+    <div class="info-cards">
+
+      <!-- Email Card -->
+      <a href="mailto:tropicalleafcorner@gmail.com" class="info-card" id="contact-email-card" aria-label="Send us an email">
+        <div class="info-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="20" height="16" x="2" y="4" rx="2"/>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+        </div>
+        <h3 class="info-card__title">Email Us</h3>
+        <p class="info-card__detail">tropicalleafcorner&#64;gmail.com</p>
+        <span class="info-card__hint">Tap to compose</span>
+      </a>
+
+      <!-- Phone Card (Coming Soon) -->
+      <div class="info-card info-card--muted" id="contact-phone-card" aria-label="Phone number coming soon">
+        <div class="info-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+        </div>
+        <h3 class="info-card__title">Call Us</h3>
+        <p class="info-card__detail info-card__detail--coming-soon">Coming Soon</p>
+        <span class="info-card__hint">Phone line launching soon</span>
+      </div>
+
+      <!-- Hours Card -->
+      <div class="info-card" id="contact-hours-card" aria-label="Business hours">
+        <div class="info-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3 class="info-card__title">Hours</h3>
+        <p class="info-card__detail">Mon – Fri: 9am – 5pm CST</p>
+        <span class="info-card__hint">We reply within 24 hours</span>
+      </div>
+
+    </div>
+
+    <!-- Two-Column: Form + Decorative -->
+    <div class="contact-grid">
+
+      <!-- Contact Form -->
+     <!--<div class="form-section">
+        @if (submitted()) {
+          <div class="success-state" role="status" aria-live="polite">
+            <div class="success-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h2>Message Sent!</h2>
+            <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
+            <button type="button" class="btn-primary" id="contact-send-another-btn" (click)="resetForm()">Send Another Message</button>
+          </div>
+        } @else {
+          <h2>Send Us a Message</h2>
+          <p class="form-intro">Fill out the form below and we'll get back to you as soon as possible.</p>
+
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form" id="contact-form" novalidate>
+
+          
+            <div class="form-group">
+              <label for="contact-name">Full Name <span class="required" aria-hidden="true">*</span></label>
+              <input
+                type="text"
+                id="contact-name"
+                formControlName="name"
+                placeholder="Your full name"
+                autocomplete="name"
+                [class.invalid]="contactForm.get('name')?.invalid && contactForm.get('name')?.touched"
+              />
+              @if (contactForm.get('name')?.invalid && contactForm.get('name')?.touched) {
+                <span class="error-msg" role="alert">Please enter your name (at least 2 characters).</span>
+              }
+            </div>
+
+          
+            <div class="form-group">
+              <label for="contact-email">Email Address <span class="required" aria-hidden="true">*</span></label>
+              <input
+                type="email"
+                id="contact-email"
+                formControlName="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                [class.invalid]="contactForm.get('email')?.invalid && contactForm.get('email')?.touched"
+              />
+              @if (contactForm.get('email')?.invalid && contactForm.get('email')?.touched) {
+                <span class="error-msg" role="alert">Please enter a valid email address.</span>
+              }
+            </div>
+
+          
+            <div class="form-group">
+              <label for="contact-subject">Subject <span class="required" aria-hidden="true">*</span></label>
+              <select
+                id="contact-subject"
+                formControlName="subject"
+                [class.invalid]="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched"
+                [class.placeholder]="!contactForm.get('subject')?.value"
+              >
+                <option value="" disabled>Select a topic</option>
+                @for (option of subjectOptions(); track option) {
+                  <option [value]="option">{{ option }}</option>
+                }
+              </select>
+              @if (contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched) {
+                <span class="error-msg" role="alert">Please select a subject.</span>
+              }
+            </div>
+
+           
+            <div class="form-group">
+              <label for="contact-message">Message <span class="required" aria-hidden="true">*</span></label>
+              <textarea
+                id="contact-message"
+                formControlName="message"
+                placeholder="Tell us what's on your mind..."
+                rows="5"
+                [class.invalid]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched"
+              ></textarea>
+              @if (contactForm.get('message')?.invalid && contactForm.get('message')?.touched) {
+                <span class="error-msg" role="alert">Please enter a message (at least 10 characters).</span>
+              }
+            </div>
+
+          
+            <button
+              type="submit"
+              class="btn-primary btn-submit"
+              id="contact-submit-btn"
+              [disabled]="sending()"
+            >
+              @if (sending()) {
+                <span class="spinner" aria-hidden="true"></span>
+                Sending...
+              } @else {
+                Send Message
+              }
+            </button>
+
+          </form>
+        }
+      </div> -->
+
+      <!-- Decorative Side Panel -->
+      <aside class="deco-panel" aria-hidden="true">
+        <div class="deco-card">
+          <div class="deco-leaf-large">🌿</div>
+          <blockquote class="deco-quote">
+            "From our backyard to your teacup — a pure, authentic taste of the tropics."
+          </blockquote>
+          <div class="deco-divider"></div>
+          <p class="deco-tagline">J&amp;B's Tropical Leaf Corner</p>
+          <p class="deco-location">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Louisiana, USA
+          </p>
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
 </section>

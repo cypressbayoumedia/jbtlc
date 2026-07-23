@@ -14,6 +14,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/shop/shop').then(m => m.ShopComponent),
   },
   {
+    path: 'shop/:slug',
+    loadComponent: () => import('./pages/shop/product-detail/product-detail').then(m => m.ProductDetailComponent),
+  },
+  {
     path: 'tea-collections',
     loadComponent: () => import('./pages/tea-collections/tea-collections').then(m => m.TeaCollectionsComponent),
   },
@@ -24,6 +28,10 @@ export const routes: Routes = [
   {
     path: 'contact',
     loadComponent: () => import('./pages/contact/contact').then(m => m.ContactComponent),
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./pages/checkout/checkout').then(m => m.CheckoutComponent),
   },
   {
     path: 'buy',

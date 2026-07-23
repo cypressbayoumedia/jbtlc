@@ -1,4 +1,44 @@
 <section class="page-container">
-  <h1>Learn</h1>
-  <p>Discover the benefits of tropical botanical teas and traditional wellness practices.</p>
+  <header class="learn-header">
+    <h1>Learn</h1>
+    <p>Discover the benefits of tropical botanical teas and traditional wellness practices.</p>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state" aria-live="polite">
+      <div class="loading-spinner"></div>
+      <p>Loading articles…</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (articles().length === 0) {
+    <div class="empty-state">
+      <p>No articles available yet. Check back soon for educational content!</p>
+    </div>
+  } @else {
+    <div class="article-grid">
+      @for (article of articles(); track article.sys.id) {
+        <article class="article-card" [attr.id]="'article-' + article.sys.id">
+          @if (article.fields['heroImage']?.fields?.['file']?.['url']) {
+            <div class="article-image-wrapper">
+              <img
+                [src]="'https:' + article.fields['heroImage'].fields['file']['url']"
+                [alt]="article.fields['title'] || 'Article image'"
+                class="article-image"
+                loading="lazy"
+              />
+            </div>
+          }
+          <div class="article-details">
+            <h2 class="article-title">{{ article.fields['title'] }}</h2>
+            @if (article.fields['author']) {
+              <p class="article-author">By {{ article.fields['author'] }}</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
 </section>
